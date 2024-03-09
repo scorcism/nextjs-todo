@@ -1,25 +1,22 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { toast } from "sonner";
-import { fromZodError } from "zod-validation-error";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { fromZodError } from "zod-validation-error";
 
 import pageSchema from "@/app/helpers/validations/page.validation";
 import axiosInstance from "@/lib/axiosInstance";
-
-type Todo = {
-  todo: string;
-  status: 0 | 1;
-};
+import TodoList from "./components/TodoList";
+import { Todo, newTodo } from "@/app/helpers/types";
+import Form from "./components/Form";
 
 const page = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>("");
 
-  const addTodoToDB = async (todo: Todo) => {
+  const addTodoToDB = async (todo: newTodo) => {
     try {
       let res = await axiosInstance.post("/home", {
         todo: todo.todo,
@@ -27,7 +24,8 @@ const page = () => {
       });
       if (res.status == 201) {
         toast.success("New todo added");
-        setTodo('')
+        setTodo("");
+        getTodosDB();
       } else {
         toast.error("Internal server error");
       }
@@ -36,10 +34,10 @@ const page = () => {
     }
   };
 
-  const addToto = () => {
+  const addTodo = () => {
     // Validate the todo
-    const newTodo: Todo = { todo, status: 0 };
-    const parse = pageSchema.todoSchema.safeParse(newTodo);
+    const newTodo: newTodo = { todo, status: 0 };
+    const parse = pageSchema.todoSchema.safeParse({ todo, status: 0 });
     if (parse.success) {
       addTodoToDB(newTodo);
     } else {
@@ -49,12 +47,11 @@ const page = () => {
   };
 
   // Get todo list
-
   const getTodosDB = async () => {
     try {
       let res = await axiosInstance.get("/home");
       if (res.status == 200) {
-        setTodos(res.data?.data)
+        setTodos(res.data?.data);
       } else {
         toast.error("Internal server error");
       }
@@ -63,52 +60,52 @@ const page = () => {
     }
   };
 
-  useEffect(()=> {
-    getTodosDB()
-  },[])
+  useEffect(() => {
+    getTodosDB();
+  }, []);
+
+  // Update todo
+  const updateTodo = async (status: number, id: number) => {
+    try {
+      let res = await axiosInstance.put("/home", { status, id });
+      if (res.status == 200) {
+        toast.success("Todo updated");
+        getTodosDB();
+      } else {
+        toast.error("Internal server error");
+      }
+    } catch (error) {
+      toast.error("Internal server error");
+    }
+  };
+
+  // Delete todo
+  const deleteTodo = async (id: number) => {
+    try {
+      let res = await axiosInstance.delete(`/home?id=${id}`);
+      if (res.status == 200) {
+        toast.success("Todo deleted");
+        getTodosDB();
+      } else {
+        toast.error("Internal server error");
+      }
+    } catch (error) {
+      toast.error("Internal server error");
+    }
+  };
 
   return (
-    <div className="flex w-full h-full items-center justify-center flex-col gap-5 overflow-scroll">
-      <div className="min-w-[50%] max-w-[50%] rounded p-2 bg-black/20 flex flex-col gap-3 my-10">
-        {/* Title */}
-        <h1 className="text-xl font-extrabold">Todos🍕</h1>
+    <div className="flex w-full h-full items-center flex-col gap-5 overflow-scroll">
+      <div className="rounded p-2 bg-black/20 flex flex-col gap-3 mt-[10%] w-[100%] md:w-[50%]">
 
-        {/* Input field */}
-        <Input
-          placeholder="Enter todo🎈"
-          value={todo}
-          onChange={(e) => setTodo(e.target.value)}
+        <Form todo={todo} setTodo={setTodo} addTodo={addTodo} />
+        <TodoList
+          todos={todos}
+          deleteTodo={deleteTodo}
+          updateTodo={updateTodo}
         />
 
-        {/* Date picker and switch for todo status */}
-        <div className="flex"></div>
-
-        {/* Save button */}
-        <Button variant="secondary" onClick={addToto}>
-          Add Todo
-        </Button>
-        {/* List of todos */}
       </div>
-
-      {todos.length > 0 && (
-        <>
-          <div className="min-w-[50%] max-w-[50vw] rounded p-2 bg-black/20 flex flex-col gap-3">
-            {/* Title */}
-            <h1 className="text-xl font-extrabold">All Todos🖨️</h1>
-            <div className="flex flex-col gap-3 max-w-[100%]">
-              {todos.map((t: Todo, index: number) => (
-                <div
-                  key={index}
-                  className="flex flex-row bg-white/10 rounded-sm items-center px-2 py-2 justify-between max-w-[100%] h-min"
-                >
-                  <h3 className="text-md text-wrap">{t.todo}</h3>
-                  <Switch checked={t.status ? true : false} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };

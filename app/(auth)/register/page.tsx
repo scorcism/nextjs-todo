@@ -1,0 +1,68 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import React, { ChangeEvent, useState } from "react";
+
+type userDataType = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+const page = () => {
+  const [userData, setUserData] = useState<userDataType>({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUserData({
+      ...userData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const submitForm = () => {
+    console.log("userData: ", userData);
+  };
+
+  return (
+    <div className="h-full flex flex-col items-center">
+      <div className="flex flex-col gap-5 w-[100%] md:w-[50%] bg-black/20 p-2 rounded mt-[10%]">
+        <h1 className="text-2xl font-semibold ">Register🪴</h1>
+        <input
+          className="text-xl px-2 py-1 rounded outline-none text-black"
+          placeholder="Name...🧑‍🦰"
+          type="text"
+          name="name"
+          id="name"
+          value={userData.name}
+          onChange={handleChange}
+        />
+        <input
+          className="text-xl px-2 py-1 rounded outline-none text-black"
+          placeholder="Email...🍰"
+          type="text"
+          name="email"
+          id="email"
+          value={userData.email}
+          onChange={handleChange}
+        />
+        <input
+          className="text-xl px-2 py-1 rounded outline-none text-black"
+          placeholder="Password...🔏"
+          type="text"
+          name="password"
+          id="password"
+          value={userData.password}
+          onChange={handleChange}
+        />
+        <Button variant="secondary" onClick={submitForm}>
+          SUBMIT🚇
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default page;

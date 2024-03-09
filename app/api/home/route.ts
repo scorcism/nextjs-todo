@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
-import { validate } from "../helpers/validations/validate";
-import { addTodoSchema } from "../helpers/validations/home.validations";
-import { homeService } from "../services/home.service";
 import { revalidatePath } from "next/cache";
+import { NextRequest, NextResponse } from "next/server";
+import { addTodoSchema } from "../helpers/validations/home.validations";
+import { validate } from "../helpers/validations/validate";
+import { homeService } from "../services/home.service";
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
       validateBody.data?.status
     );
     if (!res.success) {
-      revalidatePath('/home')
+      revalidatePath("/home");
       return NextResponse.json({ ...res }, { status: 400 });
     }
     return NextResponse.json({ ...res }, { status: 201 });
@@ -32,6 +32,34 @@ export async function POST(req: Request) {
 export async function GET() {
   try {
     const res = await homeService.todoList();
+    return NextResponse.json({ ...res }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 400 }
+    );
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const reqBody = await req.json();
+    const { id, status } = reqBody;
+    const res = await homeService.updateTodoStatus(status, id);
+    return NextResponse.json({ ...res }, { status: 200 });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: "Internal server error" },
+      { status: 400 }
+    );
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const searchParams = req.nextUrl.searchParams;
+    const id = Number(searchParams.get("id"));
+    const res = await homeService.deleteTodo(id);
     return NextResponse.json({ ...res }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
