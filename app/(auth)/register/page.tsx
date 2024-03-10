@@ -1,17 +1,13 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import axiosInstance from "@/lib/axiosInstance";
+import { registerUserDataType } from "@/lib/definations";
+import { AxiosError } from "axios";
 import Link from "next/link";
 import React, { ChangeEvent, useState } from "react";
-import { useFormStatus, useFormState } from "react-dom";
-
-type userDataType = {
-  name: string;
-  email: string;
-  password: string;
-};
 
 const page = () => {
-  const [userData, setUserData] = useState<userDataType>({
+  const [userData, setUserData] = useState<registerUserDataType>({
     name: "",
     email: "",
     password: "",
@@ -24,23 +20,28 @@ const page = () => {
     });
   };
 
-  const authenticate = () => {
-    console.log("userData: ", userData);
+  const [error, setError] = useState("");
+
+  const submitForm = async () => {
+    try {
+      const res = await axiosInstance.post("/user/register", {
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+      });
+
+      setError(res?.data.data);
+    } catch (error: any | AxiosError) {
+      const errorMessage = error?.response?.data.error;
+      setError(errorMessage);
+    }
   };
-
-  const pending = useFormStatus();
-
-  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
-
-  console.log("errorMessage: ", errorMessage);
 
   return (
     <div className="h-full flex flex-col items-center">
-      <form
-        action={dispatch}
-        className="flex flex-col gap-5 w-[100%] md:w-[50%] bg-black/20 p-2 rounded mt-[10%]"
-      >
+      <div className="flex flex-col gap-5 w-[100%] md:w-[50%] bg-black/20 p-2 rounded mt-[10%]">
         <h1 className="text-2xl font-semibold ">Register🪴</h1>
+        <h1 className="text-red-700">{error}</h1>
         <input
           className="text-xl px-2 py-1 rounded outline-none text-black"
           placeholder="Name...🧑‍🦰"
@@ -76,14 +77,10 @@ const page = () => {
             </Link>
           </p>
         </div>
-        <Button
-          disabled={pending ? true : false}
-          type="submit"
-          variant="secondary"
-        >
+        <Button onClick={submitForm} variant="secondary">
           SUBMIT🚇
         </Button>
-      </form>
+      </div>
     </div>
   );
 };
