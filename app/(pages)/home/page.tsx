@@ -18,7 +18,7 @@ const page = () => {
 
   const addTodoToDB = async (todo: newTodo) => {
     try {
-      let res = await axiosInstance.post("/home", {
+      let res = await axiosInstance.post("/todo", {
         todo: todo.todo,
         status: todo.status,
       });
@@ -49,7 +49,7 @@ const page = () => {
   // Get todo list
   const getTodosDB = async () => {
     try {
-      let res = await axiosInstance.get("/home");
+      let res = await axiosInstance.get("/todo");
       if (res.status == 200) {
         setTodos(res.data?.data);
       } else {
@@ -67,7 +67,7 @@ const page = () => {
   // Update todo
   const updateTodo = async (status: number, id: number) => {
     try {
-      let res = await axiosInstance.put("/home", { status, id });
+      let res = await axiosInstance.put("/todo", { status, id });
       if (res.status == 200) {
         toast.success("Todo updated");
         getTodosDB();
@@ -97,14 +97,12 @@ const page = () => {
   return (
     <div className="flex w-full h-full items-center flex-col gap-5 overflow-scroll">
       <div className="rounded p-2 bg-black/20 flex flex-col gap-3 mt-[10%] w-[100%] md:w-[50%]">
-
         <Form todo={todo} setTodo={setTodo} addTodo={addTodo} />
-        <TodoList
+        {/* <TodoList
           todos={todos}
           deleteTodo={deleteTodo}
           updateTodo={updateTodo}
-        />
-
+        /> */}
       </div>
     </div>
   );

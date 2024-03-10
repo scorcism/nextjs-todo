@@ -1,6 +1,8 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import React, { ChangeEvent, useState } from "react";
+import { useFormStatus, useFormState } from "react-dom";
 
 type userDataType = {
   name: string;
@@ -22,13 +24,22 @@ const page = () => {
     });
   };
 
-  const submitForm = () => {
+  const authenticate = () => {
     console.log("userData: ", userData);
   };
 
+  const pending = useFormStatus();
+
+  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+
+  console.log("errorMessage: ", errorMessage);
+
   return (
     <div className="h-full flex flex-col items-center">
-      <div className="flex flex-col gap-5 w-[100%] md:w-[50%] bg-black/20 p-2 rounded mt-[10%]">
+      <form
+        action={dispatch}
+        className="flex flex-col gap-5 w-[100%] md:w-[50%] bg-black/20 p-2 rounded mt-[10%]"
+      >
         <h1 className="text-2xl font-semibold ">Register🪴</h1>
         <input
           className="text-xl px-2 py-1 rounded outline-none text-black"
@@ -57,10 +68,22 @@ const page = () => {
           value={userData.password}
           onChange={handleChange}
         />
-        <Button variant="secondary" onClick={submitForm}>
+        <div>
+          <p>
+            Already have an account?{" "}
+            <Link href="/login" className="text-red-600">
+              Login
+            </Link>
+          </p>
+        </div>
+        <Button
+          disabled={pending ? true : false}
+          type="submit"
+          variant="secondary"
+        >
           SUBMIT🚇
         </Button>
-      </div>
+      </form>
     </div>
   );
 };

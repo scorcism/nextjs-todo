@@ -2,7 +2,7 @@ import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { addTodoSchema } from "../helpers/validations/home.validations";
 import { validate } from "../helpers/validations/validate";
-import { homeService } from "../services/home.service";
+import { homeService } from "../services/todo.service";
 
 export async function POST(req: Request) {
   try {

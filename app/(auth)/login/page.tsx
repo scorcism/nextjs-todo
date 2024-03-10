@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import React, { ChangeEvent, useState } from "react";
 
 type userDataType = {
@@ -46,10 +47,18 @@ const page = () => {
           value={userData.password}
           onChange={handleChange}
         />
+
+        <div>
+          <p>
+            New here?{" "}
+            <Link href="/register" className="text-red-600">
+              Register
+            </Link>
+          </p>
+        </div>
         <Button variant="secondary" onClick={submitForm}>
           SUBMIT🚇
         </Button>
-        
       </div>
     </div>
   );
