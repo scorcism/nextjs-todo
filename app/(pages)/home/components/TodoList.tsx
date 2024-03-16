@@ -1,15 +1,62 @@
+"use client";
 import { Todo } from "@/app/helpers/types";
 import { Switch } from "@/components/ui/switch";
+import axiosInstance from "@/lib/axiosInstance";
 import { BadgeX } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-type Props = {
-  todos: any;
-  deleteTodo: any;
-  updateTodo: any;
-};
+const TodoList = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
 
-const TodoList = ({ todos, deleteTodo, updateTodo }: Props) => {
+  // Get todo list
+  const getTodosDB = async () => {
+    try {
+      let res = await axiosInstance.get("/todo");
+      if (res.status == 200) {
+        setTodos(res.data?.data);
+      } else {
+        toast.error("Internal server error");
+      }
+    } catch (error) {
+      toast.error("Internal server error");
+    }
+  };
+
+  useEffect(() => {
+    getTodosDB();
+  }, []);
+
+  // Update todo
+  const updateTodo = async (status: number, id: number) => {
+    try {
+      let res = await axiosInstance.put("/todo", { status, id });
+      if (res.status == 200) {
+        toast.success("Todo updated");
+        getTodosDB();
+      } else {
+        toast.error("Internal server error");
+      }
+    } catch (error) {
+      toast.error("Internal server error");
+    }
+  };
+
+  // Delete todo
+  const deleteTodo = async (id: number) => {
+    try {
+      let res = await axiosInstance.delete(`/home?id=${id}`);
+      if (res.status == 200) {
+        toast.success("Todo deleted");
+        getTodosDB();
+      } else {
+        toast.error("Internal server error");
+      }
+    } catch (error) {
+      toast.error("Internal server error");
+    }
+  };
+
   return (
     <>
       {todos && todos.length > 0 && (

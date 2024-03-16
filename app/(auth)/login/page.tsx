@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import axiosInstance from "@/lib/axiosInstance";
 import { AxiosError } from "axios";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { ChangeEvent, useState } from "react";
 
 type userDataType = {
@@ -22,7 +23,9 @@ const page = () => {
       [e.target.name]: e.target.value,
     });
   };
+  const router = useRouter();
 
+  
   const [error, setError] = useState("");
   const submitForm = async () => {
     try {
@@ -30,8 +33,8 @@ const page = () => {
         email: userData.email,
         password: userData.password,
       });
-
-      setError(res?.data.data);
+      setError(res?.data.message);
+      router.push("/home", { scroll: false });
     } catch (error: any | AxiosError) {
       const errorMessage = error?.response?.data.error;
       setError(errorMessage);

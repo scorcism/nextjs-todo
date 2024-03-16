@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { dbModule } from "../config/database";
 import { user } from "../schema/user";
-import { loginUserData, registerUserDataType } from "@/lib/definations";
+import { loginUserData, registerUserDataType } from "../../../lib/definations";
 import { compareSync, genSaltSync, hashSync } from "bcryptjs";
 
 const registerUser = async (

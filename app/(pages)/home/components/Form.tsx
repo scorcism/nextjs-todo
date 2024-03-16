@@ -1,14 +1,53 @@
+import { newTodo } from "@/app/helpers/types";
+import { todoSchemas } from "@/app/helpers/validations/page.validation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React from "react";
+import axiosInstance from "@/lib/axiosInstance";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { fromZodError } from "zod-validation-error";
 
-type Props = {
-  todo: any;
-  setTodo: any;
-  addTodo: any;
-};
+const Form = () => {
+  const [todo, setTodo] = useState<string>("");
 
-const Form = ({ todo, setTodo, addTodo }: Props) => {
+  const addTodoToDB = async (todo: newTodo) => {
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      let res = await axiosInstance.post(
+        "/todo",
+        {
+          todo: todo.todo,
+          status: todo.status,
+        },
+        {
+          headers: headers,
+        }
+      );
+      if (res.status == 201) {
+        toast.success("New todo added");
+        setTodo("");
+      } else {
+        toast.error("Internal server error");
+      }
+    } catch (error) {
+      toast.error("Internal server error");
+    }
+  };
+
+  const addTodo = () => {
+    // Validate the todo
+    const newTodo: newTodo = { todo, status: 0 };
+    const parse = todoSchemas.todoSchema.safeParse({ todo, status: 0 });
+    if (parse.success) {
+      addTodoToDB(newTodo);
+    } else {
+      const validationError = fromZodError(parse.error).details;
+      toast.error(validationError[0]?.message);
+    }
+  };
+
   return (
     <div className="w-[100%] rounded p-2 bg-black/20 flex flex-col gap-3 my-10 ">
       {/* Title */}

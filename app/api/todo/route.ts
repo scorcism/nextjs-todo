@@ -3,9 +3,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { addTodoSchema } from "../helpers/validations/home.validations";
 import { validate } from "../helpers/validations/validate";
 import { homeService } from "../services/todo.service";
+import { CustomRequest } from "@/middleware";
+import { cookies } from "next/headers";
+import { isAuth } from "@/lib/isAuth";
 
-export async function POST(req: Request) {
+export const POST = async (req: CustomRequest) => {
   try {
+    const cookieStore = cookies();
+    const authToken = cookieStore.get("AUTH_TOKEN");
+
+    const userData = await isAuth(authToken?.value);
+
+    console.log(userData);
+    // Get the user data from middleware
+
     const reqBody = await req.json();
     // validate req body
     const validateBody = validate(reqBody, addTodoSchema);
@@ -27,7 +38,7 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
-}
+};
 
 export async function GET() {
   try {

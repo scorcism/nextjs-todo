@@ -6,4 +6,5 @@ export const config = {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
   },
+  JWT_SECRET: process.env.JWT_SECRET as string,
 };

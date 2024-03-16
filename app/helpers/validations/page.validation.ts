@@ -7,6 +7,6 @@ const todoSchema = z.object({
   status: z.number(),
 });
 
-export default {
+export const todoSchemas =  {
   todoSchema,
 };
